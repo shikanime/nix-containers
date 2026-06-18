@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -68,5 +70,14 @@ var (
 
 func init() {
 	skaffoldCmd.AddCommand(skaffoldBuildCmd)
+	skaffoldBuildCmd.Flags().String(
+		"platform",
+		"",
+		"comma-separated target platforms os/arch (e.g., linux/amd64,linux/arm64)",
+	)
+	if err := viper.BindPFlag("platforms", skaffoldBuildCmd.Flags().Lookup("platform")); err != nil {
+		slog.Error("bind flag failed", "flag", "platform", "err", err)
+		os.Exit(1)
+	}
 	rootCmd.AddCommand(skaffoldCmd)
 }
